@@ -41,10 +41,11 @@
   }
   body.loading{overflow:hidden;height:100vh}
   img{display:block;max-width:100%}
+  .avatar-img{object-fit:cover;object-position:center}
   a{color:inherit;text-decoration:none}
   ::selection{background:var(--accent);color:#fff}
 
-  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad);position:relative;z-index:1}
   .section{padding-block:clamp(88px,13vh,168px)}
   .eyebrow{
     font-family:var(--display);
@@ -130,12 +131,22 @@
       radial-gradient(620px 480px at 50% 28%, var(--accent-soft) 0%, transparent 70%);
     opacity:.9;
   }
-  .hero-grid-lines{
-    position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5;
-    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
-    background-size:54px 54px;
-    -webkit-mask-image:radial-gradient(60% 55% at 50% 40%,#000 0%,transparent 78%);
-    mask-image:radial-gradient(60% 55% at 50% 40%,#000 0%,transparent 78%);
+  /* aurora motif — remplace l'ancien quadrillage */
+  .hero-aurora{
+    position:absolute;inset:-12% -12% 0;z-index:0;pointer-events:none;opacity:.7;
+    background:
+      radial-gradient(38% 48% at 22% 30%, rgba(123,130,255,.38), transparent 60%),
+      radial-gradient(36% 44% at 80% 24%, rgba(62,69,230,.30), transparent 62%),
+      radial-gradient(46% 50% at 52% 80%, rgba(150,160,255,.24), transparent 62%);
+    filter:blur(26px);
+    -webkit-mask-image:radial-gradient(72% 62% at 50% 42%,#000,transparent 82%);
+    mask-image:radial-gradient(72% 62% at 50% 42%,#000,transparent 82%);
+    animation:auroraDrift 18s ease-in-out infinite;
+  }
+  @keyframes auroraDrift{
+    0%,100%{transform:translate3d(0,0,0) scale(1)}
+    33%{transform:translate3d(2.5%,-2%,0) scale(1.07)}
+    66%{transform:translate3d(-2.5%,1.5%,0) scale(1.04)}
   }
   .hero-content{position:relative;z-index:2;max-width:880px;padding-inline:var(--pad)}
   .hero-avatar-wrap{position:relative;width:max-content;margin:0 auto 34px;perspective:700px}
@@ -268,7 +279,9 @@
     font-size:clamp(2.3rem,6vw,4.2rem);color:var(--ink);
   }
   #contact .big b{font-weight:700;color:var(--accent)}
-  .contact-avatar{width:88px;height:88px;border-radius:50%;margin:0 auto 30px;box-shadow:0 18px 44px -20px rgba(62,69,230,.5)}
+  .contact-avatar{width:88px;height:88px;border-radius:50%;margin:0 auto 30px;box-shadow:0 18px 44px -20px rgba(62,69,230,.5);
+    animation:floatSway 7s ease-in-out infinite;transition:filter .4s var(--ease),box-shadow .4s var(--ease)}
+  .contact-avatar:hover{animation-play-state:paused;filter:brightness(1.06) saturate(1.06);box-shadow:0 22px 50px -18px rgba(62,69,230,.72)}
   .mail{
     display:inline-flex;align-items:center;gap:12px;margin-top:34px;cursor:pointer;
     font-family:var(--display);font-size:clamp(1.05rem,2.4vw,1.5rem);font-weight:500;color:var(--ink);
@@ -379,6 +392,193 @@
 
   .projects-grid{perspective:1400px}
 
+  /* ============ PROJECTS CAROUSEL (coverflow) ============ */
+  .proj-carousel{position:relative;margin-top:6px}
+  .proj-stage{position:relative;width:100%;user-select:none;transition:height .5s var(--ease)}
+  .proj-carousel .project{position:absolute;top:0;left:50%;width:min(520px,86vw);margin:0;opacity:0;
+    transform:translate3d(-50%,0,0);
+    transition:transform .6s var(--ease),opacity .6s var(--ease),filter .6s var(--ease);
+    will-change:transform,opacity;backface-visibility:hidden}
+  .proj-carousel .project.is-active{cursor:default}
+  .proj-carousel .project:not(.is-active){cursor:pointer}
+  .proj-carousel .project:not(.is-active):hover{filter:blur(0) brightness(1.05)!important}
+  .carousel-btn{position:absolute;top:42%;transform:translateY(-50%);z-index:50;width:52px;height:52px;border-radius:50%;
+    border:1px solid var(--line);background:rgba(255,255,255,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    display:grid;place-items:center;cursor:pointer;color:var(--ink);box-shadow:0 12px 30px -16px rgba(10,10,40,.4);
+    transition:background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease)}
+  .carousel-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .carousel-btn.prev{left:clamp(2px,2vw,24px)}
+  .carousel-btn.next{right:clamp(2px,2vw,24px)}
+  .carousel-btn svg{width:20px;height:20px}
+  .carousel-dots{display:flex;gap:9px;justify-content:center;margin-top:30px}
+  .carousel-dots .dot{width:9px;height:9px;padding:0;border:none;border-radius:50%;background:var(--line);cursor:pointer;
+    transition:background .3s var(--ease),width .3s var(--ease)}
+  .carousel-dots .dot.on{background:var(--accent);width:26px;border-radius:6px}
+  .carousel-hint{text-align:center;margin-top:15px;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  @media(max-width:760px){.carousel-btn{width:44px;height:44px}}
+
+  /* ============ BLUE BACKGROUND DECO — digital transformation motif ============ */
+  .bg-host{position:relative}
+  .bg-deco{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+  .shape{position:absolute;will-change:transform}
+  .s-ring{border:1.6px solid var(--accent);border-radius:50%}
+  .s-square{border:1.6px solid var(--accent);border-radius:5px}
+  .s-dot{background:var(--accent);border-radius:50%}
+  .s-blob{border-radius:50%;background:radial-gradient(circle,var(--accent-2),transparent 68%);filter:blur(26px)}
+  .s-dots{background-image:radial-gradient(var(--accent) 1.4px,transparent 1.5px);background-size:20px 20px}
+  .s-plus{background:linear-gradient(var(--accent),var(--accent)) center/100% 1.6px no-repeat,linear-gradient(var(--accent),var(--accent)) center/1.6px 100% no-repeat}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+  @keyframes floatr{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(10deg)}}
+  @keyframes spinslow{to{transform:rotate(360deg)}}
+  .fl{animation:floaty 7s ease-in-out infinite}
+  .flr{animation:floatr 9s ease-in-out infinite}
+  .rot{animation:spinslow 30s linear infinite}
+
+  /* ============ MASCOT (floating avatar) ============ */
+  .mascot{position:absolute;z-index:2;border-radius:50%;box-shadow:0 18px 40px -16px rgba(62,69,230,.5);
+    width:clamp(60px,6.5vw,88px);height:clamp(60px,6.5vw,88px);animation:floatSway 7s ease-in-out infinite;
+    transition:filter .4s var(--ease),box-shadow .4s var(--ease)}
+  .mascot::after{content:"";position:absolute;inset:-22%;border-radius:50%;z-index:-1;background:radial-gradient(circle,var(--accent-2),transparent 65%);opacity:.4;filter:blur(8px);animation:glowPulse 4.5s ease-in-out infinite}
+  .mascot:hover{animation-play-state:paused;filter:brightness(1.07) saturate(1.08);box-shadow:0 22px 50px -16px rgba(62,69,230,.7)}
+  /* avatars : animations & micro-interactions */
+  @keyframes floatSway{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-13px) rotate(2.5deg)}}
+  @keyframes glowPulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:.6;transform:scale(1.12)}}
+  /* motif : anneaux en orbite autour de l'avatar du hero */
+  .hero-avatar-wrap::before{content:"";position:absolute;inset:-40%;z-index:-1;border-radius:50%;
+    border:1.5px dashed rgba(123,130,255,.38);animation:spinslow 26s linear infinite;pointer-events:none}
+  .hero-avatar-wrap::after{content:"";position:absolute;inset:-62%;z-index:-1;border-radius:50%;
+    border:1px solid rgba(123,130,255,.2);animation:spinslow 44s linear infinite reverse;pointer-events:none}
+  .nav-avatar{transition:transform .35s var(--ease)}
+  .nav-brand:hover .nav-avatar{transform:rotate(-8deg) scale(1.08)}
+  .footer-brand{display:flex;align-items:center;gap:11px}
+  .footer-avatar{width:34px;height:34px;border-radius:50%;transition:transform .35s var(--ease)}
+  .footer-brand:hover .footer-avatar{transform:rotate(10deg) scale(1.1)}
+  @media(max-width:760px){.mascot{display:none}}
+
+  /* ============ THEME TRANSITION ============ */
+  *,*::before,*::after{transition:background-color .55s ease,border-color .55s ease,color .4s ease}
+
+  /* ============ VFX (NIGHT-BLUE) THEME ============ */
+  body.vfx{
+    --bg:#080c22;
+    --bg-2:#0e1533;
+    --ink:#eef1ff;
+    --ink-2:#c3c9ef;
+    --muted:#8b93c4;
+    --line:#222b54;
+    --accent:#7c89ff;
+    --accent-2:#9aa3ff;
+    --accent-soft:#16204a;
+    --dark:#070a1e;
+    --dark-2:#0c1330;
+  }
+  body.vfx #nav{background:rgba(8,12,34,.74)}
+  body.vfx .btn-primary{background:var(--accent);color:#0a0e27}
+  body.vfx .btn-primary:hover{background:var(--accent-2)}
+  body.vfx .cta-magnetic{background:var(--accent);color:#0a0e27}
+  body.vfx .cta-magnetic .cta-arrow{background:rgba(0,0,0,.2)}
+  body.vfx .mock-bar{background:rgba(255,255,255,.04)}
+  body.vfx .eng:hover .ico{background:var(--bg)}
+
+  /* ============ DEV / VFX TOGGLE ============ */
+  .theme-toggle{position:relative;display:inline-flex;align-items:center;padding:4px;border:1px solid var(--line);border-radius:100px;background:var(--bg-2);cursor:pointer;font-family:var(--display);font-size:.76rem;font-weight:600;letter-spacing:.03em}
+  .tt-opt{position:relative;z-index:2;min-width:46px;text-align:center;padding:6px 12px;border-radius:100px;color:var(--muted);transition:color .35s var(--ease)}
+  .tt-knob{position:absolute;z-index:1;top:4px;left:4px;width:calc(50% - 4px);height:calc(100% - 8px);background:var(--accent);border-radius:100px;transition:transform .42s var(--ease),background-color .55s ease}
+  .theme-toggle .tt-dev{color:#fff}
+  body.vfx .theme-toggle .tt-dev{color:var(--muted)}
+  body.vfx .theme-toggle .tt-vfx{color:#0a0e27}
+  body.vfx .tt-knob{transform:translateX(100%)}
+
+  /* ============ CONTACT FORM ============ */
+  .contact-form{max-width:560px;margin:46px auto 10px;text-align:left;display:grid;gap:18px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .field{display:flex;flex-direction:column;gap:8px}
+  .field label{font-family:var(--display);font-size:.78rem;font-weight:500;letter-spacing:.04em;color:var(--muted)}
+  .field input,.field textarea{font-family:var(--body);font-size:1rem;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;transition:border-color .3s var(--ease),box-shadow .3s var(--ease),background-color .55s ease,color .4s ease}
+  .field textarea{min-height:130px;resize:vertical}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .field input::placeholder,.field textarea::placeholder{color:var(--muted);opacity:.55}
+  .form-foot{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .form-note{font-size:.86rem;color:var(--accent);opacity:0;transition:opacity .4s var(--ease)}
+  .form-note.show{opacity:1}
+  .contact-or{margin:34px 0 6px;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  @media(max-width:560px){.form-row{grid-template-columns:1fr}.theme-toggle{font-size:.7rem}.tt-opt{min-width:38px;padding:6px 9px}}
+
+  /* ============ WORK-TOGETHER (closing CTA) ============ */
+  .contact-cta{max-width:820px;margin:0 auto;text-align:center}
+  .contact-cta .contact-avatar{margin:0 auto 24px}
+  .contact-cta .eyebrow{justify-content:center}
+  .contact-cta .big{text-align:center}
+  .contact-lead{margin:18px auto 0;color:var(--muted);font-size:1.06rem;max-width:560px}
+  .trust-row{margin:42px 0 38px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:left}
+  .trust-item{display:flex;align-items:flex-start;gap:13px;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:18px 20px;transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .4s var(--ease)}
+  .trust-item:hover{transform:translateY(-4px);box-shadow:0 22px 44px -30px rgba(10,10,40,.4);border-color:transparent}
+  .trust-item .tk{flex-shrink:0;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;transition:background .5s ease}
+  .trust-item .tk svg{width:19px;height:19px}
+  .trust-item h5{font-family:var(--display);font-weight:600;font-size:.96rem;color:var(--ink);letter-spacing:-.01em}
+  .trust-item p{color:var(--muted);font-size:.86rem;line-height:1.45;margin-top:3px}
+  .btn-lg{padding:16px 32px;font-size:1.02rem}
+  .contact-cta .contact-or{margin-top:40px}
+  .contact-cta .socials{justify-content:center}
+  @media(max-width:780px){.trust-row{grid-template-columns:1fr}}
+
+  /* ============ FORM CARD (inside modal) ============ */
+  .form-card-head{margin-bottom:20px}
+  .form-card-head .eyebrow{margin-bottom:12px}
+  .form-card-head h3{font-family:var(--display);font-weight:600;font-size:1.42rem;letter-spacing:-.015em;color:var(--ink)}
+  .form-card-head p{margin-top:7px;color:var(--muted);font-size:.9rem}
+  .contact-form{display:grid;gap:16px;max-width:none;margin:0}
+  .field-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .field .opt{font-family:var(--body);font-size:.72rem;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)}
+  .field select{font-family:var(--body);font-size:1rem;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:13px 40px 13px 15px;cursor:pointer;appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371757e' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;transition:border-color .3s var(--ease),box-shadow .3s var(--ease),background-color .55s ease,color .4s ease}
+  .field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .pill-group{display:flex;flex-wrap:wrap;gap:9px}
+  .pill{position:relative;cursor:pointer;user-select:none}
+  .pill input{position:absolute;opacity:0;width:0;height:0}
+  .pill span{display:inline-block;font-size:.86rem;font-weight:500;color:var(--ink-2);background:var(--bg-2);border:1px solid var(--line);padding:9px 15px;border-radius:100px;transition:background .25s var(--ease),border-color .25s var(--ease),color .25s var(--ease),transform .25s var(--ease)}
+  .pill span:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .pill input:checked+span{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 8px 18px -10px rgba(62,69,230,.7)}
+  .pill input:focus-visible+span{box-shadow:0 0 0 3px var(--accent-soft)}
+  .consent{display:flex;align-items:flex-start;gap:11px;font-size:.84rem;color:var(--muted);line-height:1.5}
+  .consent input{margin-top:2px;width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;cursor:pointer}
+  .consent a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+  .form-foot .btn-primary{padding-inline:30px}
+
+  /* ============ MODAL ============ */
+  .modal{position:fixed;inset:0;z-index:500;display:grid;place-items:center;padding:clamp(14px,4vw,40px);
+    opacity:0;visibility:hidden;transition:opacity .35s var(--ease),visibility .35s var(--ease)}
+  .modal.open{opacity:1;visibility:visible}
+  .modal-overlay{position:absolute;inset:0;background:rgba(8,8,18,.55);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+  .modal-card{position:relative;z-index:2;width:min(600px,100%);max-height:calc(100dvh - 32px);overflow-y:auto;
+    scrollbar-width:none;-ms-overflow-style:none;
+    background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:clamp(24px,3vw,38px);
+    box-shadow:0 50px 110px -40px rgba(6,6,26,.65);
+    transform:translateY(20px) scale(.97);opacity:0;transition:transform .42s var(--ease),opacity .42s var(--ease)}
+  .modal-card::-webkit-scrollbar{display:none}
+  .modal.open .modal-card{transform:none;opacity:1}
+  .modal-close{position:absolute;top:15px;right:15px;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);
+    background:var(--bg-2);color:var(--ink-2);display:grid;place-items:center;cursor:pointer;z-index:3;
+    transition:background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease),transform .3s var(--ease)}
+  .modal-close:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:rotate(90deg)}
+  .modal-close svg{width:17px;height:17px}
+  body.modal-open{overflow:hidden}
+
+  /* ============ DEV / VFX VIEWS ============ */
+  .view{display:none}
+  .view.active{display:block;animation:viewIn .6s var(--ease)}
+  @keyframes viewIn{from{opacity:0}to{opacity:1}}
+  .vfx-hero{text-align:center;max-width:780px;margin:0 auto;padding-top:34px}
+  .vfx-ava-wrap{position:relative;width:max-content;margin:0 auto 30px}
+  .vfx-h1{font-family:var(--display);font-weight:300;font-size:clamp(2.3rem,6vw,4.5rem);line-height:1.04;letter-spacing:-.03em;color:#fff;margin-top:18px}
+  .vfx-h1 em{font-style:normal;font-weight:700;color:var(--accent-2)}
+  .vfx-sub{margin:24px auto 0;max-width:560px;color:rgba(255,255,255,.62);font-size:clamp(1rem,1.6vw,1.16rem)}
+  .vfx-hero .hero-cta{margin-top:38px;justify-content:center}
+  .vfx-hero .hero-avatar{width:clamp(108px,15vw,148px);height:clamp(108px,15vw,148px)}
+  .vfx-block{margin-top:84px}
+  #vfx .marquee{margin-top:54px}
+
   /* ============ RESPONSIVE ============ */
   @media (max-width:760px){
     .nav-links a:not(.cta-magnetic){display:none}
@@ -404,7 +604,7 @@
   <div id="loader">
     <div class="loader-inner">
       <svg class="loader-ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="56"/></svg>
-      <img class="loader-avatar avatar-img" alt="" />
+      <img class="loader-avatar avatar-img" data-src="assets/avatars/salue.jpg" alt="" />
       <div class="loader-word"><span>a</span><span>m</span><span>a</span><span>r</span><span>e</span><span>z</span></div>
       <div class="loader-bar"><i></i></div>
     </div>
@@ -416,9 +616,15 @@
   <header id="nav">
     <a href="#hero" class="nav-brand"><img class="avatar-img nav-avatar" alt="amarez" /><span>amarez</span></a>
     <nav class="nav-links">
-      <a href="#projets">Projets</a>
-      <a href="#vfx">VFX</a>
-      <a href="#contact" class="cta-magnetic" data-magnetic aria-label="Travaillons ensemble">
+      <a href="#projets" class="nav-link">Projets</a>
+      <a href="#process" class="nav-link">Méthode</a>
+      <a href="#engage" class="nav-link">Engagements</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Basculer entre le mode Dev et le mode VFX">
+        <span class="tt-opt tt-dev">Dev</span>
+        <span class="tt-opt tt-vfx">VFX</span>
+        <span class="tt-knob"></span>
+      </button>
+      <a href="#contact" class="cta-magnetic" data-magnetic data-modal-open aria-label="Travaillons ensemble">
         <span class="cta-dot"><i></i></span>
         Travaillons ensemble
         <span class="cta-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
@@ -427,14 +633,17 @@
     </nav>
   </header>
 
+  <!-- ===== DEV VIEW (developer side) ===== -->
+  <div id="view-dev" class="view active">
+
   <!-- HERO -->
   <section id="hero">
     <div class="hero-bg"></div>
-    <div class="hero-grid-lines"></div>
+    <div class="hero-aurora"></div>
     <div class="hero-content">
       <div class="hero-avatar-wrap" id="avatarWrap">
         <div class="hero-avatar-glow"></div>
-        <img class="avatar-img hero-avatar float" id="heroAvatar" alt="amarez" />
+        <img class="avatar-img hero-avatar float" id="heroAvatar" data-src="assets/avatars/salue.jpg" alt="amarez qui salue" />
       </div>
       <p class="eyebrow">Développeur Fullstack · VFX</p>
       <h1 class="rw">Entre le <em>code</em><br/>et l'<em>image</em>.</h1>
@@ -450,7 +659,13 @@
   </section>
 
   <!-- STATS -->
-  <section class="stats">
+  <section class="stats bg-host">
+    <div class="bg-deco">
+      <span class="shape s-ring fl" style="width:90px;height:90px;top:-26px;right:6%;opacity:.1"></span>
+      <span class="shape s-dots" style="width:140px;height:64px;left:3%;bottom:-12px;opacity:.08"></span>
+      <span class="shape s-plus flr" style="width:18px;height:18px;left:42%;top:22%;opacity:.22"></span>
+      <span class="shape s-square rot" style="width:22px;height:22px;right:30%;bottom:16%;opacity:.16"></span>
+    </div>
     <div class="wrap">
       <div class="stats-grid">
         <div class="stat reveal"><div class="num" data-to="4">0</div><div class="lbl">Projets aboutis</div></div>
@@ -470,7 +685,15 @@
   </div>
 
   <!-- PROJECTS -->
-  <section id="projets" class="section">
+  <section id="projets" class="section bg-host">
+    <div class="bg-deco">
+      <span class="shape s-blob" style="width:300px;height:300px;top:5%;right:-70px;opacity:.13"></span>
+      <span class="shape s-ring fl" style="width:130px;height:130px;left:-46px;top:32%;opacity:.09"></span>
+      <span class="shape s-square rot" style="width:26px;height:26px;left:47%;top:7%;opacity:.16"></span>
+      <span class="shape s-plus flr" style="width:20px;height:20px;right:13%;bottom:9%;opacity:.2"></span>
+      <span class="shape s-dots" style="width:120px;height:120px;right:5%;bottom:3%;opacity:.07"></span>
+    </div>
+    <img class="avatar-img mascot" data-src="assets/avatars/travaille.jpg" alt="amarez qui travaille" style="top:7%;right:6%"/>
     <div class="wrap">
       <div class="head reveal">
         <span class="eyebrow">Sélection</span>
@@ -478,9 +701,10 @@
         <p>Applications dynamiques, plateformes et logiciels de gestion pensés pour de vrais utilisateurs, avec une vraie attention à l'UI/UX.</p>
       </div>
 
-      <div class="projects-grid">
+      <div class="proj-carousel" id="projCarousel">
+        <div class="proj-stage" id="projStage">
 
-        <article class="project reveal">
+        <article class="project">
           <div class="project-media">
             <div class="mock">
               <div class="mock-bar"><i></i><i></i><i></i></div>
@@ -500,7 +724,7 @@
           </div>
         </article>
 
-        <article class="project reveal">
+        <article class="project">
           <div class="project-media">
             <div class="mock">
               <div class="mock-bar"><i></i><i></i><i></i></div>
@@ -520,7 +744,7 @@
           </div>
         </article>
 
-        <article class="project reveal">
+        <article class="project">
           <div class="project-media">
             <div class="mock" style="background:#0c0c14">
               <div class="mock-bar" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08)"><i style="background:rgba(255,255,255,.18)"></i><i style="background:rgba(255,255,255,.18)"></i><i style="background:rgba(255,255,255,.18)"></i></div>
@@ -539,7 +763,7 @@
           </div>
         </article>
 
-        <article class="project reveal">
+        <article class="project">
           <div class="project-media">
             <div class="mock">
               <div class="mock-bar"><i></i><i></i><i></i></div>
@@ -559,12 +783,30 @@
           </div>
         </article>
 
-      </div>
+        </div><!-- /proj-stage -->
+
+        <button class="carousel-btn prev" type="button" aria-label="Projet précédent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button class="carousel-btn next" type="button" aria-label="Projet suivant">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+
+        <div class="carousel-dots" id="projDots" role="tablist" aria-label="Projets"></div>
+        <p class="carousel-hint">Glissez · cliquez · ou utilisez les flèches ←→</p>
+      </div><!-- /proj-carousel -->
     </div>
   </section>
 
   <!-- PROCESS -->
-  <section id="process" class="section">
+  <section id="process" class="section bg-host">
+    <div class="bg-deco">
+      <span class="shape s-dots" style="width:130px;height:120px;left:2%;top:12%;opacity:.07"></span>
+      <span class="shape s-ring fl" style="width:160px;height:160px;right:-54px;bottom:6%;opacity:.08"></span>
+      <span class="shape s-dot fl" style="width:12px;height:12px;left:40%;top:16%;opacity:.25"></span>
+      <span class="shape s-plus flr" style="width:18px;height:18px;right:20%;top:22%;opacity:.2"></span>
+    </div>
+    <img class="avatar-img mascot" data-src="assets/avatars/pense.jpg" alt="amarez qui réfléchit" style="top:13%;right:7%"/>
     <div class="wrap">
       <div class="head reveal">
         <span class="eyebrow">Méthode</span>
@@ -597,7 +839,14 @@
   </section>
 
   <!-- ENGAGEMENTS -->
-  <section id="engage" class="section">
+  <section id="engage" class="section bg-host">
+    <div class="bg-deco">
+      <span class="shape s-blob" style="width:320px;height:320px;left:-80px;bottom:-50px;opacity:.13"></span>
+      <span class="shape s-square rot" style="width:24px;height:24px;left:48%;top:12%;opacity:.16"></span>
+      <span class="shape s-ring fl" style="width:110px;height:110px;right:4%;top:14%;opacity:.09"></span>
+      <span class="shape s-dots" style="width:120px;height:84px;right:14%;bottom:4%;opacity:.07"></span>
+    </div>
+    <img class="avatar-img mascot" data-src="assets/avatars/ethique.jpg" alt="amarez, fiable et éthique" style="top:13%;right:7%"/>
     <div class="wrap">
       <div class="head reveal">
         <span class="eyebrow">Mes engagements</span>
@@ -628,18 +877,31 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- /VIEW DEV -->
 
-  <!-- VFX -->
-  <section id="vfx" class="section">
+  <!-- ===== VFX VIEW (creative side) ===== -->
+  <div id="view-vfx" class="view">
+  <section id="vfx" class="section bg-host">
     <div class="spot"></div>
     <div class="wrap">
-      <div class="head reveal">
-        <span class="eyebrow">L'autre facette</span>
-        <h2 class="rw">Montage & VFX.<br/><b>Là où l'image prend vie.</b></h2>
-        <p>Quand le code s'arrête, la création continue. Montage, effets visuels, traitement d'image et motion design pour raconter, impressionner et marquer les esprits.</p>
+      <div class="vfx-hero">
+        <div class="vfx-ava-wrap">
+          <div class="hero-avatar-glow"></div>
+          <img class="avatar-img hero-avatar float" data-src="assets/avatars/clin.jpg" alt="amarez qui fait un clin d'oeil" />
+        </div>
+        <p class="eyebrow">Création visuelle</p>
+        <h2 class="vfx-h1 rw">Montage, <em>VFX</em><br/>&amp; <em>traitement d'image</em>.</h2>
+        <p class="vfx-sub">Quand le code s'arrête, la création continue. Je donne vie à l'image — montage, effets visuels, motion design et retouche — pour raconter et marquer les esprits.</p>
+        <div class="hero-cta">
+          <a href="#reel" class="btn btn-primary" data-magnetic>Voir le showreel
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#contact" class="btn btn-ghost">Me contacter</a>
+        </div>
       </div>
 
-      <div class="reveal">
+      <div class="reveal vfx-block">
         <div class="reel" id="reel" title="Showreel">
           <div class="reel-grain"></div>
           <div class="reel-play">
@@ -661,47 +923,159 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- /VIEW VFX -->
 
   <!-- CONTACT -->
-  <section id="contact" class="section">
+  <section id="contact" class="section bg-host">
+    <div class="bg-deco">
+      <span class="shape s-blob" style="width:340px;height:340px;left:50%;top:2%;transform:translateX(-50%);opacity:.1"></span>
+      <span class="shape s-ring fl" style="width:180px;height:180px;left:6%;top:22%;opacity:.08"></span>
+      <span class="shape s-ring fl" style="width:90px;height:90px;right:8%;top:16%;opacity:.1"></span>
+      <span class="shape s-plus flr" style="width:20px;height:20px;left:16%;bottom:24%;opacity:.2"></span>
+      <span class="shape s-square rot" style="width:22px;height:22px;right:18%;bottom:20%;opacity:.16"></span>
+      <span class="shape s-dots" style="width:120px;height:120px;left:30%;bottom:8%;opacity:.06"></span>
+    </div>
     <div class="wrap">
-      <img class="avatar-img contact-avatar reveal" alt="amarez" />
-      <h2 class="big rw">Un projet en tête ?<br/><b>Disons bonjour.</b></h2>
-      <div class="reveal">
-        <div class="mail" id="mail" data-email="contact@amarez.dev">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-          contact@amarez.dev
-          <span class="copied">Copié ✓</span>
+      <div class="contact-cta">
+        <img class="avatar-img contact-avatar reveal" data-src="assets/avatars/assure.jpg" alt="amarez, on est là" />
+        <span class="eyebrow reveal">Travailler ensemble</span>
+        <h2 class="big rw">Un projet en tête ?<br/><b>Parlons-en.</b></h2>
+        <p class="contact-lead reveal">Décris-moi ton besoin en moins d'une minute. Je reviens vers toi avec un premier retour, des pistes concrètes et les prochaines étapes — sans engagement.</p>
+
+        <div class="trust-row">
+            <div class="trust-item reveal">
+              <span class="tk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+              <div><h5>Réponse sous 24 h</h5><p>Une vraie réponse de ma part, jamais un message automatique.</p></div>
+            </div>
+            <div class="trust-item reveal">
+              <span class="tk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></span>
+              <div><h5>Devis gratuit & détaillé</h5><p>Un chiffrage clair, ligne par ligne. Rien ne démarre sans ton accord.</p></div>
+            </div>
+            <div class="trust-item reveal">
+              <span class="tk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+              <div><h5>Confidentialité garantie</h5><p>Tes idées restent les tiennes. NDA possible sur simple demande.</p></div>
+            </div>
         </div>
-      </div>
-      <div class="socials reveal">
-        <a class="social" href="https://wa.me/213XXXXXXXXX" target="_blank" rel="noopener" aria-label="WhatsApp">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.66.15-.2.3-.76.97-.93 1.16-.17.2-.34.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.34.45-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.66-1.6-.91-2.19-.24-.57-.48-.5-.66-.5l-.56-.01c-.2 0-.51.07-.78.37-.27.3-1.02 1-1.02 2.44s1.05 2.83 1.2 3.03c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.62.7.22 1.34.19 1.84.12.56-.08 1.76-.72 2-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35z"/><path d="M12 2.04a9.96 9.96 0 0 0-8.5 15.2L2.05 22l4.87-1.42A9.96 9.96 0 1 0 12 2.04zm0 18.18c-1.5 0-2.97-.4-4.25-1.16l-.3-.18-2.9.84.83-2.82-.2-.31a8.27 8.27 0 1 1 7.02 3.83z"/></svg>
-        </a>
-        <a class="social" href="https://www.instagram.com/amarez.dev/" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-        </a>
-        <a class="social" href="#" target="_blank" rel="noopener" aria-label="GitHub">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
-        </a>
-        <a class="social" href="#" target="_blank" rel="noopener" aria-label="LinkedIn">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8.34 18.34V9.96H5.67v8.38zM7 8.8a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1zm11.34 9.54v-4.6c0-2.46-1.31-3.6-3.06-3.6a2.64 2.64 0 0 0-2.4 1.32v-1.1h-2.66c.04.75 0 8.38 0 8.38h2.66v-4.68c0-.24.02-.48.09-.65.19-.48.62-.97 1.35-.97.96 0 1.34.72 1.34 1.78v4.52z"/></svg>
-        </a>
+
+        <div class="reveal">
+          <button type="button" class="btn btn-primary btn-lg" data-modal-open data-magnetic>Démarrer mon projet
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+
+        <p class="contact-or reveal">Ou directement</p>
+        <div class="reveal">
+          <div class="mail" id="mail" data-email="contact@amarez.dev">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            contact@amarez.dev
+            <span class="copied">Copié ✓</span>
+          </div>
+        </div>
+        <div class="socials reveal">
+          <a class="social" href="https://wa.me/213XXXXXXXXX" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.66.15-.2.3-.76.97-.93 1.16-.17.2-.34.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.34.45-.51.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.66-1.6-.91-2.19-.24-.57-.48-.5-.66-.5l-.56-.01c-.2 0-.51.07-.78.37-.27.3-1.02 1-1.02 2.44s1.05 2.83 1.2 3.03c.15.2 2.06 3.15 5 4.42.7.3 1.24.48 1.67.62.7.22 1.34.19 1.84.12.56-.08 1.76-.72 2-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35z"/><path d="M12 2.04a9.96 9.96 0 0 0-8.5 15.2L2.05 22l4.87-1.42A9.96 9.96 0 1 0 12 2.04zm0 18.18c-1.5 0-2.97-.4-4.25-1.16l-.3-.18-2.9.84.83-2.82-.2-.31a8.27 8.27 0 1 1 7.02 3.83z"/></svg>
+          </a>
+          <a class="social" href="https://www.instagram.com/amarez.dev/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="social" href="#" target="_blank" rel="noopener" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+          </a>
+          <a class="social" href="#" target="_blank" rel="noopener" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8.34 18.34V9.96H5.67v8.38zM7 8.8a1.55 1.55 0 1 0 0-3.1 1.55 1.55 0 0 0 0 3.1zm11.34 9.54v-4.6c0-2.46-1.31-3.6-3.06-3.6a2.64 2.64 0 0 0-2.4 1.32v-1.1h-2.66c.04.75 0 8.38 0 8.38h2.66v-4.68c0-.24.02-.48.09-.65.19-.48.62-.97 1.35-.97.96 0 1.34.72 1.34 1.78v4.52z"/></svg>
+          </a>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- ===== MODAL : Travailler ensemble (brief projet) ===== -->
+  <div class="modal" id="contactModal" aria-hidden="true">
+    <div class="modal-overlay" data-modal-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" type="button" data-modal-close aria-label="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="form-card-head">
+        <span class="eyebrow">Travailler ensemble</span>
+        <h3 id="modalTitle">Démarrons ton projet</h3>
+        <p>Réponse sous 24 h · les champs marqués d'un * sont obligatoires.</p>
+      </div>
+
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="cf-nom">Nom complet *</label>
+            <input id="cf-nom" name="nom" type="text" placeholder="Ex. Amine Bensalah" required />
+          </div>
+          <div class="field">
+            <label for="cf-email">Email *</label>
+            <input id="cf-email" name="email" type="email" placeholder="ton@email.com" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-top">
+            <label for="cf-entreprise">Entreprise</label>
+            <span class="opt">Optionnel</span>
+          </div>
+          <input id="cf-entreprise" name="entreprise" type="text" placeholder="Nom de ta société / marque" />
+        </div>
+
+        <div class="field">
+          <label>Type de projet *</label>
+          <div class="pill-group" role="radiogroup" aria-label="Type de projet">
+            <label class="pill"><input type="radio" name="type" value="Application web" required /><span>Application web</span></label>
+            <label class="pill"><input type="radio" name="type" value="Site vitrine" /><span>Site vitrine</span></label>
+            <label class="pill"><input type="radio" name="type" value="Logiciel de gestion" /><span>Logiciel de gestion</span></label>
+            <label class="pill"><input type="radio" name="type" value="VFX / Motion design" /><span>VFX / Motion</span></label>
+            <label class="pill"><input type="radio" name="type" value="Autre" /><span>Autre</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="cf-delai">Échéance souhaitée</label>
+          <select id="cf-delai" name="delai">
+            <option value="">Flexible</option>
+            <option value="Urgent (< 1 mois)">Urgent (&lt; 1 mois)</option>
+            <option value="1 à 3 mois">1 à 3 mois</option>
+            <option value="3 mois et +">3 mois et +</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="cf-msg">Décris ton projet *</label>
+          <textarea id="cf-msg" name="message" placeholder="Objectif, fonctionnalités attendues, public visé, ce qui existe déjà…" required></textarea>
+        </div>
+
+        <label class="consent">
+          <input type="checkbox" name="consent" required />
+          <span>J'accepte d'être recontacté(e) au sujet de ma demande. Mes informations restent confidentielles et ne sont jamais partagées.</span>
+        </label>
+
+        <div class="form-foot">
+          <button type="submit" class="btn btn-primary">Envoyer ma demande
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <span class="form-note" id="formNote">Merci ! Ta demande s'ouvre dans ta messagerie ✓</span>
+        </div>
+      </form>
+    </div>
+  </div>
+  </section>
+
   <footer>
-    <span class="brand">amarez</span>
+    <span class="footer-brand"><img class="avatar-img footer-avatar" alt="amarez"/><span class="brand">amarez</span></span>
     <small>Dev Fullstack &amp; VFX · 🇩🇿 · © <span id="year"></span></small>
   </footer>
 
 <script>
-  const AVATAR_SRC = "data:image/jpeg;base64,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";
+  const AVATAR_SRC = "data:image/jpeg;base64,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";
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Inject avatar everywhere
-  document.querySelectorAll('.avatar-img').forEach(img => { img.src = AVATAR_SRC; });
+  document.querySelectorAll('.avatar-img').forEach(img => { img.src = img.dataset.src || AVATAR_SRC; });
   document.getElementById('year').textContent = new Date().getFullYear();
 
   // Loader -> reveal
@@ -738,10 +1112,7 @@
   // Nav visibility
   const nav = document.getElementById('nav');
   const hero = document.getElementById('hero');
-  window.addEventListener('scroll', ()=>{
-    if(window.scrollY > hero.offsetHeight * 0.55) nav.classList.add('visible');
-    else nav.classList.remove('visible');
-  }, { passive:true });
+  nav.classList.add('visible');
 
   // Hero avatar cursor parallax
   if(!reduce){
@@ -823,20 +1194,85 @@
     });
   }
 
-  /* ===== 3D tilt on project cards ===== */
-  if(!reduce){
-    document.querySelectorAll('.project').forEach(card=>{
-      card.addEventListener('mousemove', e=>{
-        const r = card.getBoundingClientRect();
-        const px = (e.clientX - r.left)/r.width - .5, py = (e.clientY - r.top)/r.height - .5;
-        card.style.transform = `translateY(-8px) rotateX(${-py*5}deg) rotateY(${px*5}deg)`;
-      });
-      card.addEventListener('mouseleave', ()=>{ card.style.transform=''; });
+  /* ===== Projects coverflow carousel ===== */
+  (function(){
+    const carousel = document.getElementById('projCarousel');
+    if(!carousel) return;
+    const stage = document.getElementById('projStage');
+    const cards = [...stage.querySelectorAll('.project')];
+    const dotsWrap = document.getElementById('projDots');
+    const n = cards.length;
+    let active = 0;
+
+    cards.forEach((_, i)=>{
+      const d = document.createElement('button');
+      d.className = 'dot'; d.type = 'button';
+      d.setAttribute('role','tab'); d.setAttribute('aria-label','Projet ' + (i+1));
+      d.addEventListener('click', ()=> go(i));
+      dotsWrap.appendChild(d);
     });
-  }
+    const dots = [...dotsWrap.children];
+
+    function layout(){
+      let maxH = 0;
+      cards.forEach(c=>{ maxH = Math.max(maxH, c.offsetHeight); });
+      if(maxH) stage.style.height = maxH + 'px';
+      cards.forEach((card, i)=>{
+        let d = i - active;
+        // wrap to nearest direction for a circular feel
+        if(d >  n/2) d -= n;
+        if(d < -n/2) d += n;
+        const ad = Math.abs(d), sg = Math.sign(d);
+        let x, s, op, z, blur, pe;
+        if(ad === 0){ x=0;        s=1;   op=1;   z=30; blur=0;   pe='auto'; }
+        else if(ad === 1){ x=sg*58;  s=.8;  op=.42; z=20; blur=1.4; pe='auto'; }
+        else if(ad === 2){ x=sg*104; s=.66; op=.18; z=10; blur=3;   pe='auto'; }
+        else { x=sg*135; s=.6; op=0; z=1; blur=4; pe='none'; }
+        card.style.transform = `translate3d(calc(-50% + ${x}%), 0, 0) scale(${s})`;
+        card.style.opacity = op;
+        card.style.zIndex = z;
+        card.style.filter = blur ? `blur(${blur}px)` : 'none';
+        card.style.pointerEvents = pe;
+        card.classList.toggle('is-active', ad === 0);
+        card.setAttribute('aria-hidden', ad === 0 ? 'false' : 'true');
+      });
+      dots.forEach((dt, i)=> dt.classList.toggle('on', i === active));
+    }
+    function go(i){ active = (i % n + n) % n; layout(); }
+    const next = ()=> go(active + 1);
+    const prev = ()=> go(active - 1);
+
+    carousel.querySelector('.next').addEventListener('click', next);
+    carousel.querySelector('.prev').addEventListener('click', prev);
+    cards.forEach((card, i)=> card.addEventListener('click', (e)=>{ if(i !== active){ e.preventDefault(); go(i); } }));
+
+    // drag / swipe
+    let startX = null, moved = false;
+    stage.addEventListener('pointerdown', e=>{ startX = e.clientX; moved = false; });
+    stage.addEventListener('pointermove', e=>{ if(startX !== null && Math.abs(e.clientX - startX) > 8) moved = true; });
+    window.addEventListener('pointerup', e=>{
+      if(startX === null) return;
+      const dx = e.clientX - startX; startX = null;
+      if(Math.abs(dx) > 50){ dx < 0 ? next() : prev(); }
+    });
+
+    // keyboard
+    carousel.setAttribute('tabindex', '0');
+    carousel.addEventListener('keydown', e=>{
+      if(e.key === 'ArrowLeft'){ e.preventDefault(); prev(); }
+      else if(e.key === 'ArrowRight'){ e.preventDefault(); next(); }
+    });
+
+    window.addEventListener('resize', layout);
+    window.addEventListener('load', layout);
+    layout();
+    // re-measure once images/fonts settle
+    setTimeout(layout, 400);
+  })();
 
   /* ===== Count-up stats ===== */
   function countUp(el){
+    if(el.dataset.counted) return; el.dataset.counted = '1';
     const to = +el.dataset.to, suf = el.dataset.suffix || '', dur = 1400; let start = null;
     function tick(ts){ if(start===null) start=ts; const p=Math.min((ts-start)/dur,1); const e=1-Math.pow(1-p,3); el.textContent=Math.round(e*to)+suf; if(p<1) requestAnimationFrame(tick); }
     requestAnimationFrame(tick);
@@ -860,6 +1296,106 @@
       const r = vfx.getBoundingClientRect();
       vfx.style.setProperty('--mx', (e.clientX - r.left) + 'px');
       vfx.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  }
+
+  /* ===== Dev / VFX view switch (cut between two sides) ===== */
+  const viewDev = document.getElementById('view-dev');
+  const viewVfx = document.getElementById('view-vfx');
+  function showView(mode){
+    const isVfx = mode === 'vfx';
+    document.body.classList.toggle('vfx', isVfx);
+    if(viewDev) viewDev.classList.toggle('active', !isVfx);
+    if(viewVfx) viewVfx.classList.toggle('active', isVfx);
+    const cont = isVfx ? viewVfx : viewDev;
+    if(cont){
+      cont.querySelectorAll('.reveal').forEach(el=> el.classList.add('in'));
+      cont.querySelectorAll('.rw').forEach(el=>{ if(el._words) revealWords(el); });
+      cont.querySelectorAll('.num').forEach(el=> countUp(el));
+    }
+    window.scrollTo({ top: 0 });
+  }
+  const themeToggle = document.getElementById('themeToggle');
+  if(themeToggle){
+    themeToggle.addEventListener('click', ()=>{ showView(document.body.classList.contains('vfx') ? 'dev' : 'vfx'); });
+  }
+  const navBrand = document.querySelector('.nav-brand');
+  if(navBrand){ navBrand.addEventListener('click', (e)=>{ e.preventDefault(); showView('dev'); }); }
+
+  /* ===== Contact form -> compose email (no backend needed).
+     Pour recevoir les messages directement, branche un service comme Formspree
+     en mettant son URL dans action="" et en retirant ce handler. ===== */
+  const cform = document.getElementById('contactForm');
+  if(cform){
+    cform.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(!cform.reportValidity()) return;
+      const d = new FormData(cform);
+      const get = k => (d.get(k)||'').toString().trim();
+      const nom = get('nom'), email = get('email'), entreprise = get('entreprise');
+      const type = get('type'), delai = get('delai'), msg = get('message');
+      const subject = encodeURIComponent('Nouveau projet — ' + (type || 'Contact') + (nom ? ' · ' + nom : ''));
+      const lines = [
+        'Nom : ' + nom,
+        'Email : ' + email,
+        entreprise ? 'Entreprise : ' + entreprise : null,
+        type ? 'Type de projet : ' + type : null,
+        delai ? 'Échéance : ' + delai : null,
+        '',
+        msg
+      ].filter(v => v !== null);
+      const body = encodeURIComponent(lines.join('\n'));
+      const note = document.getElementById('formNote');
+      if(note) note.classList.add('show');
+      window.location.href = 'mailto:contact@amarez.dev?subject=' + subject + '&body=' + body;
+      setTimeout(()=>{ if(typeof closeModal === 'function') closeModal(); }, 1600);
+    });
+  }
+
+  /* ===== Liens de nav : revenir en vue Dev avant de défiler ===== */
+  document.querySelectorAll('.nav-link').forEach(a=>{
+    a.addEventListener('click', ()=>{
+      if(document.body.classList.contains('vfx')) showView('dev');
+    });
+  });
+
+  /* ===== Modale « Travailler ensemble » ===== */
+  const modal = document.getElementById('contactModal');
+  let lastFocus = null;
+  function openModal(){
+    if(!modal) return;
+    lastFocus = document.activeElement;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    const first = modal.querySelector('input, textarea, select, button');
+    setTimeout(()=>{ if(first) first.focus(); }, 60);
+  }
+  function closeModal(){
+    if(!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    if(lastFocus) lastFocus.focus();
+  }
+  document.querySelectorAll('[data-modal-open]').forEach(el=>{
+    el.addEventListener('click', (e)=>{ e.preventDefault(); openModal(); });
+  });
+  if(modal){
+    modal.querySelectorAll('[data-modal-close]').forEach(el=>{
+      el.addEventListener('click', closeModal);
+    });
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
+    // Garde le focus à l'intérieur de la modale (accessibilité)
+    modal.addEventListener('keydown', (e)=>{
+      if(e.key !== 'Tab') return;
+      const f = [...modal.querySelectorAll('a[href], button:not([disabled]), input, textarea, select')].filter(el=> el.offsetParent !== null);
+      if(!f.length) return;
+      const first = f[0], last = f[f.length-1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
     });
   }
 </script>
